@@ -1,23 +1,29 @@
 package com.thoughtworks.capability.demospringioccontainer;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class GreetingController {
-
-    private final GreetingService greetingService;
-
-    @Autowired
-    public GreetingController(GreetingService greetingService) {
-        System.out.println("======GreetingController is instantiating======");
-        this.greetingService = greetingService;
-    }
+public class GreetingController implements ApplicationContextAware {
 
     @GetMapping("/greet")
     public String greet() {
-        return greetingService.sayHi();
+        return getPrototypeBean().sayHi();
+    }
+
+    private ApplicationContext applicationContext;
+
+    public GreetingService getPrototypeBean() {
+        return applicationContext.getBean(GreetingService.class);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext)
+            throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
 }
